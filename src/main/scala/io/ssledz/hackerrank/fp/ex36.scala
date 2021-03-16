@@ -53,7 +53,16 @@ object ex36 {
 
     def solve(words: Map[Int, List[String]], ps: List[Place]): List[(Place, String)] = {
 
-      def valid(s: List[(Place, String)]): Boolean = true
+      def valid(sol: List[(Place, String)]): Boolean = {
+        sol
+          .flatMap { case (s, str) =>
+            s.ps.zip(str)
+          }
+          .groupBy(_._1)
+          .values
+          .map(_.map(_._2).toSet.size)
+          .forall(_ == 1)
+      }
 
       def go(ps: List[Place], words: Map[Int, List[String]], acc: List[(Place, String)]): List[List[(Place, String)]] =
         ps match {
@@ -66,7 +75,6 @@ object ex36 {
         }
 
       val xs = go(ps, words, List.empty)
-//      println(xs.map(sols => sols.map(sol => sol.toString).mkString("\n")).mkString("\n\n\n"))
       xs.filter(valid).head
     }
 
