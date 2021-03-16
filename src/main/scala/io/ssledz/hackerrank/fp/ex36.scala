@@ -51,15 +51,32 @@ object ex36 {
       (points(identity) ::: points(swap)).flatMap(scan)
     }
 
-    def fillPlaces(words: Map[Int, String], ps : List[Place]) : List[(Place, String)] = ???
+    def solve(words: Map[Int, List[String]], ps: List[Place]): List[(Place, String)] = {
+
+      def valid(s: List[(Place, String)]): Boolean = true
+
+      def go(ps: List[Place], words: Map[Int, List[String]], acc: List[(Place, String)]): List[List[(Place, String)]] =
+        ps match {
+          case p :: t =>
+            val ws = words(p.size)
+            ws.flatMap { w =>
+              go(t, words.updated(p.size, ws diff List(w)), (p, w) :: acc)
+            }
+          case Nil => List(acc)
+        }
+
+      val xs = go(ps, words, List.empty)
+//      println(xs.map(sols => sols.map(sol => sol.toString).mkString("\n")).mkString("\n\n\n"))
+      xs.filter(valid).head
+    }
 
     val ps = places(words.keys.min, grid)
 
-    println(ps.map(_.toString).mkString("\n"))
+    val sol = solve(words, ps).flatMap { case (p, s) =>
+      p.ps.zip(s)
+    }.toMap
 
-    println(show(grid))
-
-    println(words)
+    println(show(grid ++ sol))
 
   }
 
