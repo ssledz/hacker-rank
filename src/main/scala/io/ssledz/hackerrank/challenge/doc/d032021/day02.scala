@@ -1,5 +1,8 @@
 package io.ssledz.hackerrank.challenge.doc.d032021
 
+/** Day 2: Operators
+  * https://www.hackerrank.com/challenges/30-operators/problem
+  */
 object day02 {
 
   def main(args: Array[String]): Unit = {
