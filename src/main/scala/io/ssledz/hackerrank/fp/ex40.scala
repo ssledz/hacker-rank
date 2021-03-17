@@ -18,7 +18,11 @@ object ex40 {
 
     def subsets(m: Int): Set[Set[Int]] =
       if (m == 0) Set(Set.empty)
-      else subsets(m - 1).filterNot(s => sum(s, n) > x).flatMap(s => Set(s, s + m))
+      else
+        subsets(m - 1).flatMap { s =>
+          val ss = s + m
+          if (sum(ss, n) > x) Set(s) else Set(s, ss)
+        }
 
     val sol = subsets(max).filter(s => sum(s, n) == x)
 
