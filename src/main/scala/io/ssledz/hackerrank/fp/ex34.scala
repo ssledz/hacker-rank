@@ -49,10 +49,11 @@ object ex34 {
       val (nx, ny) = ab.unit
       val (ax, ay) = a
       xs.foldLeft((Set.empty[Point], Set.empty[Point])) { case ((l, r), p @ (px, py)) =>
-        val dx = px - ax
-        val t  = dx / nx
-        val y  = ay + t * ny
-        if (y > py) (l + p, r) else (l, r + p)
+        val dx                       = px - ax
+        val t                        = dx / nx
+        val y                        = ay + t * ny
+        def op(x: Double, y: Double) = if (nx > 0) x > y else x < y
+        if (op(y, py)) (l + p, r) else (l, r + p)
       }
     }
 
@@ -62,7 +63,7 @@ object ex34 {
       (ap - (n * (ap * n))).len
     }
 
-    def findHull(xs: Set[Point], p: Point, q: Point, b : Boolean): List[Point] = {
+    def findHull(xs: Set[Point], p: Point, q: Point): List[Point] = {
       if (xs.isEmpty) List.empty[Point]
       else {
         val pq = q.toVector - p.toVector
@@ -72,13 +73,10 @@ object ex34 {
           if (d > dmax) (x, d) else (pmax, dmax)
         }
 
-        val (s1, s2) = {
-          val (ss1, ss3) = partition(p, c, xs - c)
-          val (ss2, ss4) = partition(c, q, xs - c)
-          if(b) (ss1, ss2) else (ss3, ss4)
-        }
+        val (s1, _) = partition(p, c, xs - c)
+        val (s2, _) = partition(c, q, xs - c)
 
-        findHull(s1, p, c, b) ::: List(c) ::: findHull(s2, c, q, b)
+        findHull(s1, p, c) ::: List(c) ::: findHull(s2, c, q)
       }
     }
 
@@ -89,11 +87,7 @@ object ex34 {
 
     val (s1, s2) = partition(a, b, xs -- Set(a, b))
 
-    println(a)
-    println(b)
-
-    a :: findHull(s1, a, b, true) ::: List(b) ::: findHull(s2, b, a, false)
-//    a :: List(b) ::: findHull(s2, b, a, false)
+    a :: findHull(s1, a, b) ::: List(b) ::: findHull(s2, b, a)
   }
 
   def perimeter(xs: List[Point]): Double =
