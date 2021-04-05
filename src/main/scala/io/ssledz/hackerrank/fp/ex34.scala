@@ -47,13 +47,16 @@ object ex34 {
     def partition(a: Point, b: Point, xs: Set[Point]): (Set[Point], Set[Point]) = {
       val ab       = b.toVector - a.toVector
       val (nx, ny) = ab.unit
-      val (ax, ay) = a
-      xs.foldLeft((Set.empty[Point], Set.empty[Point])) { case ((l, r), p @ (px, py)) =>
-        val dx                       = px - ax
-        val t                        = dx / nx
-        val y                        = ay + t * ny
-        def op(x: Double, y: Double) = if (nx > 0) x > y else x < y
-        if (op(y, py)) (l + p, r) else (l, r + p)
+      if (nx == 0) (Set.empty, xs)
+      else {
+        val (ax, ay) = a
+        xs.foldLeft((Set.empty[Point], Set.empty[Point])) { case ((l, r), p @ (px, py)) =>
+          val dx                       = px - ax
+          val t                        = dx / nx
+          val y                        = ay + t * ny
+          def op(x: Double, y: Double) = if (nx > 0) x > y else x < y
+          if (op(y, py)) (l + p, r) else (l, r + p)
+        }
       }
     }
 
@@ -77,6 +80,7 @@ object ex34 {
         val (s2, _) = partition(c, q, xs - c)
 
         findHull(s1, p, c) ::: List(c) ::: findHull(s2, c, q)
+
       }
     }
 
@@ -119,7 +123,7 @@ object ex34 {
     val dir = Files.createTempDirectory("ex34-")
     val pf  = dir.resolve(Paths.get("ex34.txt"))
     val hf  = dir.resolve(Paths.get("hull.txt"))
-    Files.writeString(hf, toStr(hull))
+    Files.writeString(hf, toStr(hull ::: List(hull.head)))
     Files.writeString(pf, toStr(xs))
     Seq(
       "gnuplot",
