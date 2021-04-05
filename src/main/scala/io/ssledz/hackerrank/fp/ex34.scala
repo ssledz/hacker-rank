@@ -122,6 +122,10 @@ object ex34 {
       "gnuplot",
       "-p",
       "-e",
+      "set xrange [-200:1200]",
+      "-e",
+      "set yrange [-200:1200]",
+      "-e",
       s"""plot "$pf" using 1:2 title "points" with points, "$hf" using 1:2 title "hull" with lines"""
     ).!
     Files.delete(pf)
