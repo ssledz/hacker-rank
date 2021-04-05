@@ -1,5 +1,8 @@
 package io.ssledz.hackerrank.fp
 
+import java.nio.file.{Files, Paths}
+import scala.sys.process._
+
 /** Convex Hull
   * https://www.hackerrank.com/challenges/convex-hull-fp/problem
   */
@@ -101,7 +104,29 @@ object ex34 {
       arr(0) -> arr(1)
     }
 
-    println(perimeter(quickHull(points.toSet)))
+    val hull = quickHull(points.toSet)
+    println(perimeter(hull))
+    draw(points, hull)
+
+  }
+
+  def draw(xs: List[Point], hull: List[Point]): Unit = {
+    def toStr(xs: List[Point]): String = xs.map { case (x, y) => s"$x $y" }.mkString("\n")
+
+    val dir = Files.createTempDirectory("ex34-")
+    val pf  = dir.resolve(Paths.get("ex34.txt"))
+    val hf  = dir.resolve(Paths.get("hull.txt"))
+    Files.writeString(hf, toStr(hull))
+    Files.writeString(pf, toStr(xs))
+    Seq(
+      "gnuplot",
+      "-p",
+      "-e",
+      s"""plot "$pf" using 1:2 title "points" with points, "$hf" using 1:2 title "hull" with lines"""
+    ).!
+    Files.delete(pf)
+    Files.delete(hf)
+    Files.delete(dir)
 
   }
 
