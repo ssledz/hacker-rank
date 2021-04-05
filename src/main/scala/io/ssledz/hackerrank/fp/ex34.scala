@@ -52,7 +52,7 @@ object ex34 {
         val dx = px - ax
         val t  = dx / nx
         val y  = ay + t * ny
-        if (y < py) (l + p, r) else (l, r + p)
+        if (y > py) (l + p, r) else (l, r + p)
       }
     }
 
@@ -62,7 +62,7 @@ object ex34 {
       (ap - (n * (ap * n))).len
     }
 
-    def findHull(xs: Set[Point], p: Point, q: Point): List[Point] = {
+    def findHull(xs: Set[Point], p: Point, q: Point, b : Boolean): List[Point] = {
       if (xs.isEmpty) List.empty[Point]
       else {
         val pq = q.toVector - p.toVector
@@ -71,9 +71,14 @@ object ex34 {
           val d = distance(p, n, x)
           if (d > dmax) (x, d) else (pmax, dmax)
         }
-        val (s1, _) = partition(p, c, xs - c)
-        val (s2, _) = partition(c, q, xs - c)
-        findHull(s1, p, c) ::: List(c) ::: findHull(s2, c, q)
+
+        val (s1, s2) = {
+          val (ss1, ss3) = partition(p, c, xs - c)
+          val (ss2, ss4) = partition(c, q, xs - c)
+          if(b) (ss1, ss2) else (ss3, ss4)
+        }
+
+        findHull(s1, p, c, b) ::: List(c) ::: findHull(s2, c, q, b)
       }
     }
 
@@ -84,7 +89,11 @@ object ex34 {
 
     val (s1, s2) = partition(a, b, xs -- Set(a, b))
 
-    a :: findHull(s1, a, b) ::: List(b) ::: findHull(s2, b, a)
+    println(a)
+    println(b)
+
+    a :: findHull(s1, a, b, true) ::: List(b) ::: findHull(s2, b, a, false)
+//    a :: List(b) ::: findHull(s2, b, a, false)
   }
 
   def perimeter(xs: List[Point]): Double =
@@ -122,11 +131,14 @@ object ex34 {
       "gnuplot",
       "-p",
       "-e",
+      "set term wxt size 3840,2160",
+      "-e",
       "set xrange [-200:1200]",
       "-e",
       "set yrange [-200:1200]",
       "-e",
-      s"""plot "$pf" using 1:2 title "points" with points, "$hf" using 1:2 title "hull" with lines"""
+//      s"""plot "$pf" using 1:2:(sprintf("(%d, %d)", $$1, $$2)) with labels notitle, "$hf" using 1:2 title "hull" with lines"""
+      s"""plot "$pf" using 1:2 with points, "$hf" using 1:2 title "hull" with lines"""
     ).!
     Files.delete(pf)
     Files.delete(hf)
